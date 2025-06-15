@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MR SMILE - Neon Tech Blue</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #000;
+      --text-color: #00aaff;
+      --btn-bg: #000;
+      --btn-text: #00aaff;
+      --border-color: #00aaff;
+      --shadow-color: #00aaff;
+    }
+
+    body.light-mode {
+      --bg-color: #fff;
+      --text-color: #111;
+      --btn-bg: #fff;
+      --btn-text: #111;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Orbitron', sans-serif;
+      transition: 0.4s;
+      overflow: hidden;
+    }
+
+    /* Login Screen */
+    #login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: black;
+      color: #00ccff;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    #login-screen input {
+      margin: 10px;
+      padding: 10px;
+      width: 250px;
+      border: 2px solid #00ccff;
+      background: transparent;
+      color: #00ccff;
+      font-family: 'Share Tech Mono';
+    }
+
+    #login-screen button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #00ccff;
+      color: black;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #login-error {
+      color: red;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* Stylish Loading Overlay */
+    #loading-overlay {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #000000, #001f33);
+      color: #00ccff;
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Share Tech Mono', monospace;
+      text-align: center;
+      padding: 30px;
+    }
+
+    .neon-ring {
+      width: 90px;
+      height: 90px;
+      border: 8px solid #00aaff33;
+      border-top: 8px solid #00ccff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite, glow 1.5s ease-in-out infinite alternate;
+      margin-bottom: 20px;
+    }
+
+    .loading-title {
+      font-size: 24px;
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+      animation: glow-text 2s ease-in-out infinite alternate;
+    }
+
+    .loading-logs span {
+      display: block;
+      margin: 5px 0;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .dots::after {
+      content: '';
+      animation: dots 1.5s steps(3, end) infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 5px #00ccff; }
+      to { box-shadow: 0 0 20px #00ccff; }
+    }
+
+    @keyframes glow-text {
+      from { text-shadow: 0 0 5px #00ccff; }
+      to { text-shadow: 0 0 20px #00ccff; }
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes dots {
+      0% { content: ''; }
+      33% { content: '.'; }
+      66% { content: '..'; }
+      100% { content: '...'; }
+    }
+
+    /* Main Content (hidden initially) */
+    #main-content {
+      display: none;
+    }
+
+    video.bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      filter: brightness(0.2) blur(2px);
+    }
+
+    .menu-icon {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      cursor: pointer;
+      z-index: 99;
+    }
+
+    .menu-icon div {
+      width: 30px;
+      height: 4px;
+      background-color: var(--text-color);
+      margin: 6px 0;
+    }
+
+    .toggle-mode,
+    .settings-btn {
+      position: absolute;
+      top: 15px;
+      background: none;
+      border: 2px solid var(--border-color);
+      color: var(--text-color);
+      padding: 5px 12px;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      border-radius: 5px;
+      z-index: 99;
+      transition: 0.3s;
+    }
+
+    .toggle-mode:hover,
+    .settings-btn:hover {
+      background-color: var(--border-color);
+      color: var(--bg-color);
+    }
+
+    .toggle-mode { right: 80px; }
+    .settings-btn { right: 20px; }
+
+    .sidebar {
+      position: absolute;
+      top: 0;
+      left: -280px;
+      width: 260px;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.9);
+      padding: 40px 20px;
+      transition: 0.4s;
+      z-index: 98;
+      border-right: 2px solid var(--border-color);
+    }
+
+    .sidebar.active { left: 0; }
+
+    .sidebar button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      background: var(--btn-bg);
+      border: 2px solid var(--border-color);
+      color: var(--btn-text);
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .center-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 90px;
+      text-align: center;
+    }
+
+    .typing-svg {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 20px;
+      color: var(--text-color);
+      margin-bottom: 15px;
+      border-right: 3px solid var(--text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0;
+      animation: typing 4s steps(40, end) infinite alternate, blink 0.7s step-end infinite;
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 320px; }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+
+    .profile-pic {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 4px solid var(--border-color);
+      box-shadow: 0 0 20px var(--shadow-color);
+    }
+
+    .button-container {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .neon-button {
+      background: var(--border-color);
+      color: var(--bg-color);
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .neon-button:hover {
+      background: #0088ff;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 60px;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 🔐 Login Section -->
+<div id="login-screen">
+  <h2>🔐 MR SMILE LOGIN</h2>
+  <input type="text" id="username" placeholder="Username" />
+  <input type="password" id="password" placeholder="Password" />
+  <button onclick="handleLogin()">Login</button>
+  <p id="login-error">❌ Invalid Credentials</p>
+</div>
+
+<!-- ⏳ Loading Overlay -->
+<div id="loading-overlay">
+  <div class="neon-ring"></div>
+  <h2 class="loading-title">MR SMILE SYSTEM</h2>
+  <div class="loading-logs">
+    <span>🔌 Connecting systems<span class="dots"></span></span>
+    <span>⚡ Booting modules<span class="dots"></span></span>
+    <span>🧠 Loading intelligence<span class="dots"></span></span>
+    <span>✅ Launching interface<span class="dots"></span></span>
+  </div>
+</div>
+
+<!-- 🌐 Main Content -->
+<div id="main-content">
+  <video class="bg-video" autoplay muted loop>
+    <source src="https://cdn.coverr.co/videos/coverr-electric-glow-6519/1080p.mp4" type="video/mp4">
+  </video>
+
+  <div class="menu-icon" onclick="document.getElementById('sidebar').classList.toggle('active')">
+    <div></div><div></div><div></div>
+  </div>
+
+  <button class="toggle-mode" onclick="toggleMode()">🌙</button>
+  <button class="settings-btn" onclick="alert('Settings coming soon!')">⚙️</button>
+
+  <div class="sidebar" id="sidebar">
+    <button onclick="window.open('https://hire-silk.vercel.app', '_blank')">👨‍💻 Hire Me</button>
+    <button onclick="window.open('https://projects-ruby-eta.vercel.app/', '_blank')">📈 My Projects</button>
+    <button onclick="window.open('https://cvdownload.vercel.app/', '_blank')">📄 Download CV</button>
+    <button onclick="window.open('https://demo-teal-beta-36.vercel.app/', '_blank')">🎮 Live Demo</button>
+    <button onclick="window.open('https://chat.whatsapp.com/IIQDqrWc7FY4fc7URGZmni', '_blank')">💬 Join Community</button>
+    <button onclick="window.open('https://whatsapp.com/channel/0029VaesBAXJJhzefVszDu3h', '_blank')">🗣️ Feedback</button>
+    <button onclick="window.open('https://tutorial-two-lake.vercel.app/', '_blank')">📘 Tutorials</button>
+    <button onclick="window.open('https://hlp-peach.vercel.app/', '_blank')">❓ Help / FAQs</button>
+    <button onclick="window.open('https://api-one-silk-53.vercel.app/', '_blank')">🔗 APIs</button>
+  </div>
+
+  <div class="center-content">
+    <div class="typing-svg">WELCOME TO MR SMILE WEBSITE</div>
+    <img src="https://files.catbox.moe/59ol8w.jpg" alt="Profile Picture" class="profile-pic" />
+    <div class="button-container">
+      <button class="neon-button" onclick="window.open('https://phase1-three.vercel.app', '_blank')">🚀 MR SMILE PROJECT</button>
+      <button class="neon-button" onclick="window.open('https://buysc-jade.vercel.app', '_blank')">🛒 Buy CRUSHLORD V4 SCRIPTS</button>
+      <button class="neon-button" onclick="window.open('https://panel-phi-murex.vercel.app', '_blank')">🧰 PANELS AND OTHER SERVICES</button>
+      <button class="neon-button" onclick="window.open('https://wa.me/254107065646', '_blank')">📞 CONTACT MR SMILE</button>
+      <button class="neon-button" onclick="window.open('https://whatsapp.com/channel/0029VaesBAXJJhzefVszDu3h', '_blank')">💡 SUPPORT CHANNEL</button>
+    </div>
+    <div class="footer">
+      <p>© 2025 MR SMILE.CO.KE</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleMode() {
+    document.body.classList.toggle("light-mode");
+    const btn = document.querySelector('.toggle-mode');
+    btn.innerText = document.body.classList.contains("light-mode") ? "🌞" : "🌙";
+  }
+
+  function handleLogin() {
+    const user = document.getElementById('username').value.trim().toLowerCase();
+    const pass = document.getElementById('password').value.trim().toLowerCase();
+    const error = document.getElementById('login-error');
+
+    if (user === 'mrsmile' && pass === 'tech') {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('loading-overlay').style.display = 'flex';
+      setTimeout(() => {
+        document.getElementById("loading-overlay").style.display = "none";
+        document.getElementById("main-content").style.display = "block";
+        document.body.style.overflow = "auto";
+      }, 3500);
+    } else {
+      error.style.display = 'block';
+    }
+  }
+</script>
+
+</body>
+</html>
